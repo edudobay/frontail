@@ -64,7 +64,7 @@ describe('connectBuilder', () => {
 
   it('should build app that serve index file', (done) => {
     const app = connectBuilder()
-      .index(path.join(__dirname, 'fixtures/index'), '/testfile')
+      .index('/', path.join(__dirname, 'fixtures/index'), '/testfile')
       .build();
 
     request(app)
@@ -73,9 +73,20 @@ describe('connectBuilder', () => {
       .expect('Content-Type', 'text/html', done);
   });
 
+  it('should build app with replaceable root url', (done) => {
+    const app = connectBuilder()
+      .index('/banana', path.join(__dirname, 'fixtures/index'), '/testfile')
+      .build();
+
+    request(app)
+      .get('/banana')
+      .expect(200)
+      .expect('Content-Type', 'text/html', done);
+  });
+
   it('should build app that replace index title', (done) => {
     const app = connectBuilder()
-      .index(path.join(__dirname, 'fixtures/index_with_title'), '/testfile')
+      .index('/', path.join(__dirname, 'fixtures/index_with_title'), '/testfile')
       .build();
 
     request(app)
@@ -85,7 +96,7 @@ describe('connectBuilder', () => {
 
   it('should build app that sets socket.io namespace based on files', (done) => {
     const app = connectBuilder()
-      .index(path.join(__dirname, 'fixtures/index_with_ns'), '/testfile', 'ns', 'dark')
+      .index('/', path.join(__dirname, 'fixtures/index_with_ns'), '/testfile', 'ns', 'dark')
       .build();
 
     request(app)
@@ -95,7 +106,7 @@ describe('connectBuilder', () => {
 
   it('should build app that sets theme', (done) => {
     const app = connectBuilder()
-      .index(path.join(__dirname, '/fixtures/index_with_theme'), '/testfile', 'ns', 'dark')
+      .index('/', path.join(__dirname, '/fixtures/index_with_theme'), '/testfile', 'ns', 'dark')
       .build();
 
     request(app)
@@ -108,7 +119,7 @@ describe('connectBuilder', () => {
 
   it('should build app that sets default theme', (done) => {
     const app = connectBuilder()
-      .index(path.join(__dirname, '/fixtures/index_with_theme'), '/testfile')
+      .index('/', path.join(__dirname, '/fixtures/index_with_theme'), '/testfile')
       .build();
 
     request(app)

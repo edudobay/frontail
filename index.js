@@ -32,6 +32,10 @@ const sessionKey = 'sid';
 const files = program.args.join(' ');
 const filesNamespace = crypto.createHash('md5').update(files).digest('hex');
 
+function strippedRootUrl(url) {
+  return url.replace(/\/$/, '')
+}
+
 if (program.daemonize) {
   daemonize(__filename, program, {
     doAuthorization,
@@ -41,14 +45,15 @@ if (program.daemonize) {
   /**
    * HTTP(s) server setup
    */
+  const rootUrl = strippedRootUrl(program.rootUrl);
   const appBuilder = connectBuilder();
   if (doAuthorization) {
     appBuilder.session(sessionSecret, sessionKey);
     appBuilder.authorize(program.user, program.password);
   }
   appBuilder
-    .static(path.join(__dirname, 'web/assets'))
-    .index(path.join(__dirname, 'web/index.html'), files, filesNamespace, program.theme);
+    .static(rootUrl, path.join(__dirname, 'web/assets'))
+    .index(rootUrl, path.join(__dirname, 'web/index.html'), files, filesNamespace, program.theme);
 
   const builder = serverBuilder();
   if (doSecure) {
@@ -65,6 +70,7 @@ if (program.daemonize) {
    */
   const io = socketio.listen(server, {
     log: false,
+    path: rootUrl + '/socket.io',
   });
 
   if (doAuthorization) {
